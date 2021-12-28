@@ -192,7 +192,6 @@ def test_get_commit_part(monkeypatch, test_git_repo):
 
 def test_main(monkeypatch, tmpdir, test_git_repo):
     git_repo, _ = test_git_repo
-    monkeypatch.chdir(git_repo.workspace)
     monkeypatch.setenv("CIRCLECI", "true")
     monkeypatch.setenv("MAPPINGS", 'path:changed_file; .; {"param": "val"}')
     monkeypatch.setenv("CIRCLE_BRANCH", "main")
@@ -201,12 +200,14 @@ def test_main(monkeypatch, tmpdir, test_git_repo):
     monkeypatch.setattr(
         "src.scripts.set_parameters.find_parent_commit", lambda x, y, z=1: find_parent_commit(x, None, z)
     )
+    monkeypatch.chdir(git_repo.workspace)
     main()
 
     with open(out_path) as fd:
         assert load(fd) == {"param": "val"}
 
 
-def test_main_outside_ci():
+def test_main_outside_ci(monkeypatch):
+    monkeypatch.setenv("CIRCLECI", "")
     with pytest.raises(RuntimeError):
         main()
