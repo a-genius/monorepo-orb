@@ -4,8 +4,6 @@ description: >
 
 executor: python
 
-
-
 parameters:
   base-revision:
     default: main
@@ -13,40 +11,47 @@ parameters:
     type: string
   mappings:
     default: ""
-    description: |
+    description: >
       Mapping of regular expressions to modules and pipeline parameters.
       One mapping per line, semicolon-delimited.
-      Structure of the mapping is as follows: `where_to_match:pattern; module_name; parameters`
+      Structure of the mapping is as follows:
+      `<< where_to_match >>: << regex_pattern>>; << module_name>> ; << parameters >>`
         - `where_to_match` tells where the patter will be applied. Can be `path`, `tag`, `branch`, `subject`
-        - `pattern` a python regex to use
+        - `regex_pattern` a pythonic regex pattern to use on `where_to_match`
         - `module_name` is the name of the module which CircleCI config will be joined into continuation config.
-            `module_name` must have `.circleci/config.yml` inside.
+            `module_name` must have `.circleci/config.yml` inside, i.e. `module1/.circleci/config.yml`.
         - `parameters` a JSON blob with parameters to pass into continuation API. Parameters from mappings that
             sit lower will override previous parameters
       Lines that start with `#` are ignored.
     type: string
   params-path:
     default: /tmp/pipeline-parameters.json
-    description: |
+    description: >
       Path to save the generated parameters to.
       Defaults to /tmp/pipeline-parameters.json even if not set.
     type: string
+  default-params:
+    default: "{}"
+    description: JSON blob of parameters that will always be addded to the << params-path >>
+    type: string
   modules-path:
     default: /tmp/modules.txt
-    description: |
+    description: >
       Path to the file that will contain all configs that will be joined.
       Defaults to /tmp/modules.txt even if not set.
     type: string
+  default-modules:
+    description: >
+      A comma-separated list of default modules to join.
+      Each module must have `.circleci/config.yml` in it.
+    type: string
+    default: ""
   max-age:
     default: 4
-    description: |
+    description: >
       How many months back to look for the base commit for the branch.
       Set to 0 to look at the whole history.
     type: integer
-  default-params:
-    default: "{}"
-    description: Json blob of parameters that will always be addded to the << params-path >>
-    type: string
   continue-config:
     description: Path to the internally-used config for continuation
     type: string
@@ -54,11 +59,13 @@ parameters:
 
 steps:
   - checkout
+  - prepare-modules:
+      modules-path: << parameters.modules-path >>
+      default-modules: << parameters.default-modules >>
   - set-parameters:
       base-revision: << parameters.base-revision >>
       mappings: << parameters.mappings >>
       params-path: << parameters.params-path >>
-      modules-path: << parameters.modules-path >>
       max-age: << parameters.max-age >>
       default-params: << parameters.default-params >>
   - merge-configs:

@@ -1,11 +1,11 @@
 description: >
+  __This job will not trigger setup workflow continuation.__
   Prepare parameters that will be passed to continuation workflow,
-  merge and validate configs, trigger continuation endpoint.
+  merge and validate configs, __does not__ trigger continuation endpoint.
+  This job may be useful when more steps need to happen before triggering the
+  continuation workflow.
 
 executor: python
-
-
-
 
 parameters:
   base-revision:
@@ -32,22 +32,28 @@ parameters:
       Path to save the generated parameters to.
       Defaults to /tmp/pipeline-parameters.json even if not set.
     type: string
+  default-params:
+    default: "{}"
+    description: Json blob of parameters that will always be addded to the << params-path >>
+    type: string
   modules-path:
     default: /tmp/modules.txt
     description: |
       Path to the file that will contain all configs that will be joined.
       Defaults to /tmp/modules.txt even if not set.
     type: string
+  default-modules:
+    description: >
+      A comma-separated list of default modules to join.
+      Each module must have `.circleci/config.yml` in it.
+    type: string
+    default: ""
   max-age:
     default: 4
     description: |
       How many months back to look for the base commit for the branch.
       Set to 0 to look at the whole history.
     type: integer
-  default-params:
-    default: "{}"
-    description: Json blob of parameters that will always be addded to the << params-path >>
-    type: string
   continue-config:
     description: Path to the internally-used config for continuation
     type: string
@@ -55,11 +61,13 @@ parameters:
 
 steps:
   - checkout
+  - prepare-modules:
+      modules-path: << parameters.modules-path >>
+      default-modules: << parameters.default-modules >>
   - set-parameters:
       base-revision: << parameters.base-revision >>
       mappings: << parameters.mappings >>
       params-path: << parameters.params-path >>
-      modules-path: << parameters.modules-path >>
       max-age: << parameters.max-age >>
       default-params: << parameters.default-params >>
   - merge-configs:

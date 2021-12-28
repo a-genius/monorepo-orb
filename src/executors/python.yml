@@ -1,7 +1,6 @@
 
 
-description: >
-  This is a sample executor using Docker and Node.
+description: Executor that uses python 3.10 by default
 docker:
   - image: '<<parameters.image>>:<<parameters.tag>>'
 parameters:
