@@ -1,10 +1,25 @@
 #!/usr/bin/env bash
 
-if [ ! -f "<< parameters.modules-path >>" ] || [ ! -s "<< parameters.modules-path >>" ]
-then
-  echo 'Nothing to merge. Halting the job.'
-  circleci-agent step halt
-  exit
-fi
+Merge() {
+  if [ ! -f "${MODULES_PATH}" ] || [ ! -s "${MODULES_PATH}" ]
+  then
+    echo 'Nothing to merge. Halting the job.'
+    circleci-agent step halt
+    exit
+  fi
 
-xargs -a "${MODULES_PATH}" yq -y -s 'reduce .[] as $item ({}; . * $item)' | tee "${CONTINUE_CONFIG}"
+  cat "${MODULES_PATH}" | xargs yq -y -s 'reduce .[] as $item ({}; . * $item)' | tee "${CONTINUE_CONFIG}"
+
+  if [[ $? == 0 ]]; then
+      echo "Configs merged successfully at ${CONTINUE_CONFIG}"
+  else
+      echo "Failed to merge configs"
+  fi
+}
+
+# Will not run if sourced for bats-core tests.
+# View src/tests for more information.
+ORB_TEST_ENV="bats-core"
+if [ "${0#*$ORB_TEST_ENV}" == "$0" ]; then
+    Merge
+fi
