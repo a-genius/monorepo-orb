@@ -40,10 +40,12 @@ jobs:
           command: pip install poetry
       - run:
           name: install dependencies
-          command: poetry install -n --no-root
+          command: |
+            poetry config virtualenvs.create false
+            poetry install --no-interaction --no-ansi --no-root
       - run:
           name: run unit tests
-          command: python -m pytest src/tests
+          command:  python -m pytest --cov="src/scripts" --cov-report term-missing src/tests/
 
 workflows:
   # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
