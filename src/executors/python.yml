@@ -5,8 +5,8 @@ docker:
   - image: '<<parameters.image>>:<<parameters.tag>>'
 parameters:
   tag:
-    default: 3.10
+    default: "3.10"
     type: string
   image:
-    default: cimg/python
+    default: "cimg/python"
     type: string

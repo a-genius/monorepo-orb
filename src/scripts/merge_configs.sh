@@ -8,9 +8,8 @@ Merge() {
     exit
   fi
 
-  cat "${MODULES_PATH}" | xargs yq -y -s 'reduce .[] as $item ({}; . * $item)' | tee "${CONTINUE_CONFIG}"
-
-  if [[ $? == 0 ]]; then
+  # shellcheck disable=SC2016
+  if xargs yq -y -s 'reduce .[] as $item ({}; . * $item)' < "${MODULES_PATH}" | tee "${CONTINUE_CONFIG}"; then
       echo "Configs merged successfully at ${CONTINUE_CONFIG}"
   else
       echo "Failed to merge configs"

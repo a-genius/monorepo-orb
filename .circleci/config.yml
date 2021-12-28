@@ -36,8 +36,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install pytest
-          command: pip install pytest
+          name: install poetry
+          command: pip install poetry
+      - run:
+          name: install dependencies
+          command: poetry install -n --no-root
       - run:
           name: run unit tests
           command: python -m pytest src/tests
