@@ -1,0 +1,72 @@
+description: >
+  Prepare parameters that will be passed to continuation workflow,
+  merge and validate configs, trigger continuation endpoint.
+
+executor: python
+
+
+
+
+parameters:
+  base-revision:
+    default: main
+    description: The revision to compare the current one against for the purpose of determining changed files.
+    type: string
+  mappings:
+    default: ""
+    description: |
+      Mapping of regular expressions to modules and pipeline parameters.
+      One mapping per line, semicolon-delimited.
+      Structure of the mapping is as follows: `where_to_match:pattern; module_name; parameters`
+        - `where_to_match` tells where the patter will be applied. Can be `path`, `tag`, `branch`, `subject`
+        - `pattern` a python regex to use
+        - `module_name` is the name of the module which CircleCI config will be joined into continuation config.
+            `module_name` must have `.circleci/config.yml` inside.
+        - `parameters` a JSON blob with parameters to pass into continuation API. Parameters from mappings that
+            sit lower will override previous parameters
+      Lines that start with `#` are ignored.
+    type: string
+  params-path:
+    default: /tmp/pipeline-parameters.json
+    description: |
+      Path to save the generated parameters to.
+      Defaults to /tmp/pipeline-parameters.json even if not set.
+    type: string
+  modules-path:
+    default: /tmp/modules.txt
+    description: |
+      Path to the file that will contain all configs that will be joined.
+      Defaults to /tmp/modules.txt even if not set.
+    type: string
+  max-age:
+    default: 4
+    description: |
+      How many months back to look for the base commit for the branch.
+      Set to 0 to look at the whole history.
+    type: integer
+  default-params:
+    default: "{}"
+    description: Json blob of parameters that will always be addded to the << params-path >>
+    type: string
+  continue-config:
+    description: Path to the internally-used config for continuation
+    type: string
+    default: .circleci/continue-config.yml
+
+steps:
+  - checkout
+  - set-parameters:
+      base-revision: << parameters.base-revision >>
+      mappings: << parameters.mappings >>
+      params-path: << parameters.params-path >>
+      modules-path: << parameters.modules-path >>
+      max-age: << parameters.max-age >>
+      default-params: << parameters.default-params >>
+  - merge-configs:
+      modules-path: << parameters.modules-path >>
+      continue-config: << parameters.continue-config >>
+  - circleci-cli/install:
+      version: v0.1.16508
+  - run:
+      name: Validate continuation config
+      command: circleci --skip-update-check config validate << parameters.continue-config >>

@@ -1,0 +1,54 @@
+description: >
+  Generates a set of pipeline parameters from `mapping` at `output-path`.
+
+
+
+parameters:
+  base-revision:
+    default: main
+    description: The revision to compare the current one against for the purpose of determining changed files.
+    type: string
+    mappings:
+      default: ""
+      description: |
+        Mapping of regular expressions to modules and pipeline parameters.
+        One mapping per line, semicolon-delimited.
+        Structure of the mapping is as follows: `where_to_match:pattern; module_name; parameters`
+          - `where_to_match` tells where the patter will be applied. Can be `path`, `tag`, `branch`, `subject`
+          - `pattern` a python regex to use
+          - `module_name` is the name of the module which CircleCI config will be joined into continuation config.
+              `module_name` must have `.circleci/config.yml` inside.
+          - `parameters` a JSON blob with parameters to pass into continuation API. Parameters from mappings that
+              sit lower will override previous parameters
+        Lines that start with `#` are ignored.
+      type: string
+    params-path:
+      default: /tmp/pipeline-parameters.json
+      description: |
+        Path to save the generated parameters to.
+        Defaults to /tmp/pipeline-parameters.json even if not set.
+      type: string
+    max-age:
+      default: 4
+      description: |
+        How many months back to look for the base commit for the branch.
+        Set to 0 to look at the whole history.
+      type: integer
+    default-params:
+      default: "{}"
+      description: Json blob of parameters that will always be addded to the << params-path >>
+      type: string
+steps:
+  - run:
+      name: Set parameters
+      shell: /usr/bin/env python3
+      environment:
+        BASE_REVISION: << parameters.base-revision >>
+        MAPPINGS: << parameters.mappings >>
+        PARAMS_PATH: << parameters.params-path >>
+        MAX_AGE: << parameters.max-age >>
+        DEFAULT_PARAMS: << parameters.default-params >>
+      command: <<include(scripts/set_parameters.py)>>
+  - run:
+      name: Show parameters
+      command: cat << parameters.params-path >>

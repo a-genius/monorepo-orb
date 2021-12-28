@@ -1,0 +1,13 @@
+
+
+description: >
+  This is a sample executor using Docker and Node.
+docker:
+  - image: '<<parameters.image>>:<<parameters.tag>>'
+parameters:
+  tag:
+    default: 3.10
+    type: string
+  image:
+    default: cimg/python
+    type: string

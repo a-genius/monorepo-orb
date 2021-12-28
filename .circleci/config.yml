@@ -4,7 +4,6 @@ orbs:
   # Replace this with your own!
   monorepo: genius/monorepo@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@10.0
-  bats: circleci/bats@1.0
   shellcheck: circleci/shellcheck@2.0
 
 # Pipeline Parameters
@@ -29,10 +28,19 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      # "greet" is a sample command packaged with this orb config.
-      # This sample integration test will run as long as the greet command exists. Once you remove the greet command you should remove this line.
-      # Push new changes first, before adding new tests to your config.
-      - monorepo/greet
+
+  unit-tests:
+    working_directory: ~/project/scr/tests
+    docker:
+      - image: cimg/python:3.10
+    steps:
+      - checkout
+      - run:
+          name: install pytest
+          command: pip install pytest
+      - run:
+          name: run unit tests
+          command: python -m pytest src/tests
 
 workflows:
   # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
@@ -45,9 +53,7 @@ workflows:
       - shellcheck/check:
           dir: ./src/scripts
           exclude: SC2148
-      # optional: Run BATS tests against your scripts
-      - bats/run:
-          path: ./src/tests
+      - unit-tests
       # Publish development version(s) of the orb.monorepo/greet
       - orb-tools/publish-dev:
           orb-name: genius/monorepo
@@ -55,8 +61,8 @@ workflows:
           requires:
             - orb-tools/lint
             - orb-tools/pack
-            - bats/run
             - shellcheck/check
+            - unit-tests
       # Trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb
       - orb-tools/trigger-integration-tests-workflow:

@@ -1,0 +1,42 @@
+description: >
+  Creates a new continuation config based on the result of `set-parameters` command.
+
+
+
+
+parameters:
+  modules-path:
+    description: Path to the file for the list of the modules to build
+    type: string
+    default: /tmp/modules.txt
+  default-modules:
+    description: >
+      A comma-separated list of default modules to join.
+      Each module must have `.circleci/config.yml` in it.
+    type: string
+    default: ""
+  continue-config:
+    description: Path to the internally-used config for continuation
+    type: string
+    default: .circleci/continue-config.yml
+
+steps:
+  - run:
+      name: Install dependencies
+      command: pip install yq
+  - run:
+      name: Prepare modules for merging
+      shell: /usr/bin/env python3
+      environment:
+        MODULES_PATH: << parameters.modules-path >>
+        DEFAULT_MODULES: << parameters.default-modules >>
+      command: <<include(scripts/prepare_modules.py)>>
+  - run:
+      name: Merge configs from modules
+      environment:
+        MODULES_PATH: << parameters.modules-path >>
+        CONTINUE_CONFIG: << parameters.continue-config >>
+      command: <<include(scripts/merge_configs.sh)>>
+  - run:
+      name: Show merged configs
+      command: cat << parameters.modules-path >>
