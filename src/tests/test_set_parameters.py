@@ -195,6 +195,7 @@ def test_main(monkeypatch, tmpdir, test_git_repo):
     monkeypatch.setenv("CIRCLECI", "true")
     monkeypatch.setenv("MAPPINGS", 'path:changed_file; .; {"param": "val"}')
     monkeypatch.setenv("CIRCLE_BRANCH", "main")
+    monkeypatch.setenv("CIRCLE_SHA1", "HEAD")
     out_path = tmpdir / "pipeline-parameters.json"
     monkeypatch.setenv("PARAMS_PATH", str(out_path))
     monkeypatch.setattr(
