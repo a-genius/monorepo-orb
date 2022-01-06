@@ -1,0 +1,13 @@
+version: 2.1
+
+description: This orb makes running CI on monorepos slightly easier
+
+# If your orb requires other orbs, you can import them like this. Otherwise remove the "orbs" stanza.
+orbs:
+  circleci-cli: circleci/circleci-cli@0.1.9
+  continuation: circleci/continuation@0.2.0
+
+# This information will be displayed in the orb registry and is not mandatory.
+display:
+  home_url: "https://www.github.com/a-genius/monorepo-orb"
+  source_url: "https://www.github.com/a-genius/monorepo-orb"

@@ -1,0 +1,4 @@
+A comma-separated list of default modules that will always be added to the << modules-path >>.
+Each module must have `.circleci/config.yml` in it.
+Specifying the full paths from repository root to config files is also allowed.
+Example: `module1,.circleci/custom-config.yml`
