@@ -74,7 +74,7 @@ def main() -> None:
     :return:
     """
     with open(getenv("MODULES_PATH", DEFAULT_MODULES_PATH)) as fd:
-        modules = get_modules(fd.read().splitlines() or [])  # pylint: disable=R1732
+        modules = get_modules(fd.readlines() or [])  # pylint: disable=R1732
 
     if not modules:
         print("Modules file is empty")
