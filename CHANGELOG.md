@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2022-01-07
+### Changed
+- multiple modules that are specified in the mapping are now split using a comma as a delimiter
+- slashes are not added to the end of module paths anymore in `prepare-pipeline-files` and `prepare_files.py`
+
 ## [0.1.2] - 2022-01-07
 ### Changed
 - behavior of `prepare_modules.py::get_modules` method. It no longer adds newlines to the constructed paths.
