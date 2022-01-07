@@ -166,17 +166,22 @@ def test_check_mapping(monkeypatch, mapping, changed_files, branch, tag, subject
             {"parameter": "value"}, "set_modules_single_module.txt"
         ),
         (
+            '{}', '', "module/file1",
+            [["path:.", "module/,module_foo/,module_bar/", '{"parameter":"value"}']],
+            {"parameter": "value"}, "set_modules_multiple_modules_different_names.txt"
+        ),
+        (
             "{}", "", "module/file1",
             [["path:^module", "module", '{"parameter":"value"}'], ["path:^module", "module", '{"parameter2":true}']],
             {"parameter": "value", "parameter2": True}, "set_modules_two_modules_same_name.txt"
         ),
         (
-            '{"parameter2":true}', "module_foo, module_bar", "module/file1",
+            '{"parameter2":true}', "module_foo/, module_bar/", "module/file1",
             [["path:^module", "module", '{"parameter":"value"}']],
             {"parameter": "value", "parameter2": True}, "set_modules_multiple_modules_different_names.txt"
         ),
         (
-            '{"parameter2":true}', 'module_foo', "module/file1",
+            '{"parameter2":true}', 'module_foo/', "module/file1",
             [["path:^module_foo", "module", '{"parameter":"value"}']],
             {"parameter2": True}, "set_modules_single_module_foo.txt"
         ),

@@ -115,12 +115,12 @@ def set_params_and_modules(diff: str, mappings: list[list[Any]]) -> None:
     param_path = getenv("PARAMS_PATH", '/tmp/pipeline-parameters.json')
     modules_path = getenv("MODULES_PATH", '/tmp/modules.txt')
     params = loads(getenv("DEFAULT_PARAMS", '{}'))
-    modules = [x.strip() if x.endswith("/") else f"{x.strip()}/" for x in getenv("DEFAULT_MODULES", "").split(",") if x]
+    modules = [x.strip() for x in getenv("DEFAULT_MODULES", "").split(",") if x]
     mappings = [x for x in mappings if check_mapping(x, diff)]
     for mapping in map(convert_mapping, mappings):
         module, new_params = mapping
         params |= new_params
-        modules.append(module.strip())
+        modules.extend(module.strip().split(','))
 
     with open(param_path, 'w') as fd:
         dump(params, fd)
