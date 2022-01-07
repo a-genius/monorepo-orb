@@ -11,12 +11,20 @@ DEFAULT_MODULES_PATH = "/tmp/modules.txt"
 
 def get_modules(input_modules: Sequence[str]) -> Set[str]:
     """
-    Takes in a sequence of module names and produce a set of paths to to their CircleCI configs.
+    Takes in a sequence of module names and/or paths to `config.yml` files
+    and produce a set of paths to to their CircleCI configs.
+    If a path to a config file is supplied - it must end in `config.yml`, otherwise
+    `.circleci/config.yml` will be added to the end of the path
     i.e.
-        input:  ['module1', 'module2', '.circleci/config.yml']
-        output: ['module1/.circleci/config.yml', 'module2/.circleci/config.yml', '.circleci/config.yml']
-    :param input_modules: sequence of module names
-    :return:
+        input:  ['module1', 'module2', '.circleci/config.yml', 'path/to/custom-config.yml']
+        output: [
+             'module1/.circleci/config.yml',
+             'module2/.circleci/config.yml',
+             '.circleci/config.yml',
+             'path/to/custom-config.yml',
+         ]
+    :param input_modules: sequence of module names and/or paths to config yaml files
+    :return: a set of paths to config yaml files
     """
     modules = set()
     for module in input_modules:
