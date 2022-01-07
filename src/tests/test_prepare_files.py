@@ -177,6 +177,16 @@ def test_check_mapping(monkeypatch, mapping, changed_files, branch, tag, subject
             {"parameter": "value"}, "empty.txt"
         ),
         (
+            '{}', '', "module/file1",
+            [["path:.", " ", '{"parameter":"value"}']],
+            {"parameter": "value"}, "empty.txt"
+        ),
+        (
+            '{}', '', "module/file1",
+            [["path:.", ", ,", '{"parameter":"value"}']],
+            {"parameter": "value"}, "empty.txt"
+        ),
+        (
             "{}", "", "module/file1",
             [["path:^module", "module/", '{"parameter":"value"}'], ["path:^module", "module/", '{"parameter2":true}']],
             {"parameter": "value", "parameter2": True}, "set_modules_two_modules_same_name.txt"
