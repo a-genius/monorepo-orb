@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- message that is printed out when the pattern matches in the commit subject.
+
+### Changed
+- `mappings` doc updated with the explanation that `re.search` is used when looking at last commit subject
 
 ## [0.1.3] - 2022-01-07
 ### Changed
