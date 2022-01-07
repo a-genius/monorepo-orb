@@ -106,8 +106,6 @@ def match(pattern: re.Pattern, haystack: str, success_msg: str) -> bool:
 
 
 def convert_mapping(mapping: list[str]) -> Tuple[str, dict[str, Any]]:
-    if not mapping[1].endswith("/"):
-        mapping[1] = mapping[1] + "/"
     return mapping[1], loads(mapping[2])
 
 
@@ -115,18 +113,18 @@ def set_params_and_modules(diff: str, mappings: list[list[Any]]) -> None:
     param_path = getenv("PARAMS_PATH", '/tmp/pipeline-parameters.json')
     modules_path = getenv("MODULES_PATH", '/tmp/modules.txt')
     params = loads(getenv("DEFAULT_PARAMS", '{}'))
-    modules = [x.strip() if x.endswith("/") else f"{x.strip()}/" for x in getenv("DEFAULT_MODULES", "").split(",") if x]
+    modules = [x.strip() for x in getenv("DEFAULT_MODULES", "").split(",") if x.strip()]
     mappings = [x for x in mappings if check_mapping(x, diff)]
     for mapping in map(convert_mapping, mappings):
         module, new_params = mapping
         params |= new_params
-        modules.append(module.strip())
+        modules.extend(module.strip().split(','))
 
     with open(param_path, 'w') as fd:
         dump(params, fd)
 
     with open(modules_path, 'w') as fd:
-        fd.writelines([x if x.endswith("\n") else f"{x}\n" for x in modules])
+        fd.writelines([x if x.endswith("\n") else f"{x}\n" for x in modules if x.strip()])
 
     log_block("set params", dumps(params, indent=4))
 
