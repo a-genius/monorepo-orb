@@ -87,6 +87,7 @@ def check_mapping(mapping: Sequence[str], diff: str) -> bool:
     if where == "subject":
         subject = get_commit_part("%s")
         if regex.search(subject):
+            print(f"Pattern '{pattern}' matched in last commit subject.")
             return True
         return False
 
