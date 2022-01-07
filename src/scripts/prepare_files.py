@@ -126,7 +126,7 @@ def set_params_and_modules(diff: str, mappings: list[list[Any]]) -> None:
         dump(params, fd)
 
     with open(modules_path, 'w') as fd:
-        dump(modules, fd)
+        fd.writelines([x if x.endswith("\n") else f"{x}\n" for x in modules])
 
     log_block("set params", dumps(params, indent=4))
 
