@@ -7,11 +7,11 @@ from src.tests.conftest import does_not_raise
 @pytest.mark.parametrize(
     "modules, expected",
     [
-        (["module1", "module2"], {"module1/.circleci/config.yml\n", "module2/.circleci/config.yml\n"}),
-        (["module1/", "module2/"], {"module1/.circleci/config.yml\n", "module2/.circleci/config.yml\n"}),
-        (["module1/.circleci/config.yml\n"], {"module1/.circleci/config.yml\n"}),
-        (["module1/.circleci/config.yml"], {"module1/.circleci/config.yml\n"}),
-        ([".circleci/common_config.yml"], {".circleci/common_config.yml\n"}),
+        (["module1", "module2"], {"module1/.circleci/config.yml", "module2/.circleci/config.yml"}),
+        (["module1/", "module2/"], {"module1/.circleci/config.yml", "module2/.circleci/config.yml"}),
+        (["module1/.circleci/config.yml\n"], {"module1/.circleci/config.yml"}),
+        (["module1/.circleci/config.yml"], {"module1/.circleci/config.yml"}),
+        ([".circleci/common_config.yml"], {".circleci/common_config.yml"}),
         ([], set()),
         ([""], set()),
     ]
