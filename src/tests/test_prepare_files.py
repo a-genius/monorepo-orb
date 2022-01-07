@@ -158,40 +158,49 @@ def test_check_mapping(monkeypatch, mapping, changed_files, branch, tag, subject
 
 
 @pytest.mark.parametrize(
-    "default_params, default_modules, diff, mappings, expected_params, expected_modules",
+    "default_params, default_modules, diff, mappings, expected_params, expected_modules_file",
     [
         (
             "{}", "", "module/file1",
             [["path:^module", "module", '{"parameter":"value"}']],
-            {"parameter": "value"}, ["module/"]
+            {"parameter": "value"}, "set_modules_single_module.txt"
         ),
         (
             "{}", "", "module/file1",
             [["path:^module", "module", '{"parameter":"value"}'], ["path:^module", "module", '{"parameter2":true}']],
-            {"parameter": "value", "parameter2": True}, ["module/", "module/"]
+            {"parameter": "value", "parameter2": True}, "set_modules_two_modules_same_name.txt"
         ),
         (
             '{"parameter2":true}', "module_foo, module_bar", "module/file1",
             [["path:^module", "module", '{"parameter":"value"}']],
-            {"parameter": "value", "parameter2": True}, ["module/", "module_foo/", "module_bar/"]
+            {"parameter": "value", "parameter2": True}, "set_modules_multiple_modules_different_names.txt"
         ),
         (
             '{"parameter2":true}', 'module_foo', "module/file1",
             [["path:^module_foo", "module", '{"parameter":"value"}']],
-            {"parameter2": True}, ["module_foo/"]
+            {"parameter2": True}, "set_modules_single_module_foo.txt"
         ),
         (
             '{}', "", "module/file1",
             [["path:^module_foo", "module", '{"parameter":"value"}']],
-            {}, []
+            {}, "empty.txt"
         ),
     ]
 )
 def test_set_params(
-    monkeypatch, tmpdir, default_params, default_modules, diff, mappings, expected_params, expected_modules
+    monkeypatch,
+    tmpdir,
+    test_data_dir,
+    default_params,
+    default_modules,
+    diff,
+    mappings,
+    expected_params,
+    expected_modules_file
 ):
     params_out_path = tmpdir / "pipeline-parameters.json"
     modules_out_path = tmpdir / "modules.txt"
+    modules_expected_file = test_data_dir / "txt" / expected_modules_file
     monkeypatch.setenv("PARAMS_PATH", str(params_out_path))
     monkeypatch.setenv("MODULES_PATH", str(modules_out_path))
     monkeypatch.setenv("DEFAULT_PARAMS", default_params)
@@ -202,8 +211,8 @@ def test_set_params(
     with open(params_out_path) as fd:
         assert load(fd) == expected_params
 
-    with open(modules_out_path) as fd:
-        assert sorted(load(fd)) == sorted(expected_modules)
+    with open(modules_out_path) as out, open(modules_expected_file) as expected:
+        assert sorted(out.readlines()) == sorted(expected.readlines())
 
 
 def test_log_block(capsys):
