@@ -106,8 +106,6 @@ def match(pattern: re.Pattern, haystack: str, success_msg: str) -> bool:
 
 
 def convert_mapping(mapping: list[str]) -> Tuple[str, dict[str, Any]]:
-    if not mapping[1].endswith("/"):
-        mapping[1] = mapping[1] + "/"
     return mapping[1], loads(mapping[2])
 
 
@@ -126,7 +124,7 @@ def set_params_and_modules(diff: str, mappings: list[list[Any]]) -> None:
         dump(params, fd)
 
     with open(modules_path, 'w') as fd:
-        fd.writelines([x if x.endswith("\n") else f"{x}\n" for x in modules])
+        fd.writelines([x if x.endswith("\n") else f"{x}\n" for x in modules if x])
 
     log_block("set params", dumps(params, indent=4))
 
