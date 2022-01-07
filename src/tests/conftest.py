@@ -14,7 +14,8 @@ def modules_file(tmpdir, request):
     if hasattr(request, "param") and getattr(request, "param") is not None:
         path = Path(tmpdir / "modules.txt")
         with open(path, "w") as fd:
-            fd.writelines(request.param)
+            modules = [x if x.endswith("\n") else f"{x}\n" for x in request.param]
+            fd.writelines(modules)
 
         return path
     return None

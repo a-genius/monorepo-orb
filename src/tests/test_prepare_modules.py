@@ -7,11 +7,11 @@ from src.tests.conftest import does_not_raise
 @pytest.mark.parametrize(
     "modules, expected",
     [
-        (["module1", "module2"], {"module1/.circleci/config.yml\n", "module2/.circleci/config.yml\n"}),
-        (["module1/", "module2/"], {"module1/.circleci/config.yml\n", "module2/.circleci/config.yml\n"}),
-        (["module1/.circleci/config.yml\n"], {"module1/.circleci/config.yml\n"}),
-        (["module1/.circleci/config.yml"], {"module1/.circleci/config.yml\n"}),
-        ([".circleci/common_config.yml"], {".circleci/common_config.yml\n"}),
+        (["module1", "module2"], {"module1/.circleci/config.yml", "module2/.circleci/config.yml"}),
+        (["module1/", "module2/"], {"module1/.circleci/config.yml", "module2/.circleci/config.yml"}),
+        (["module1/.circleci/config.yml\n"], {"module1/.circleci/config.yml"}),
+        (["module1/.circleci/config.yml"], {"module1/.circleci/config.yml"}),
+        ([".circleci/common_config.yml"], {".circleci/common_config.yml"}),
         ([], set()),
         ([""], set()),
     ]
@@ -45,12 +45,7 @@ def test_dump_modules(monkeypatch, tmpdir):
 @pytest.mark.parametrize(
     "modules_file, expected",
     [
-        ([], ["module1/.circleci/config.yml\n", "module2/.circleci/config.yml\n"]),
         (["module1", "module2"], ["module1/.circleci/config.yml\n", "module2/.circleci/config.yml\n"]),
-        (
-            ["module1", "module3"],
-            ["module1/.circleci/config.yml\n", "module2/.circleci/config.yml\n", "module3/.circleci/config.yml\n"]
-        ),
         ([], []),
     ], indirect=["modules_file"]
 )
@@ -59,4 +54,18 @@ def test_main(monkeypatch, tmpdir, modules_file, expected):
     monkeypatch.setattr("src.scripts.prepare_modules.check_configs_exist", lambda x: True)
     main()
     with open(str(modules_file)) as fd:
-        assert fd.readlines().sort() == expected.sort()
+        assert sorted(fd.readlines()) == sorted(expected)
+
+
+def test_main_file_check(monkeypatch, tmpdir, test_data_dir):
+    modules_file = tmpdir / "modules.txt"
+    monkeypatch.setenv("MODULES_PATH", str(modules_file))
+    check_files = [
+        str(test_data_dir / 'yaml' / 'config.yaml') + "\n",
+        str(test_data_dir / 'yaml' / 'custom-config.yaml') + "\n",
+    ]
+
+    with open(modules_file, 'w') as fd:
+        fd.writelines(check_files)
+
+    main()

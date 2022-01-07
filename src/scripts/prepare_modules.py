@@ -11,12 +11,20 @@ DEFAULT_MODULES_PATH = "/tmp/modules.txt"
 
 def get_modules(input_modules: Sequence[str]) -> Set[str]:
     """
-    Takes in a sequence of module names and produce a set of paths to to their CircleCI configs.
+    Takes in a sequence of module names and/or paths to `config.yml` files
+    and produce a set of paths to to their CircleCI configs.
+    If a path to a config file is supplied - it must end in `config.yml`, otherwise
+    `.circleci/config.yml` will be added to the end of the path
     i.e.
-        input:  ['module1', 'module2', '.circleci/config.yml']
-        output: ['module1/.circleci/config.yml', 'module2/.circleci/config.yml', '.circleci/config.yml']
-    :param input_modules: sequence of module names
-    :return:
+        input:  ['module1', 'module2', '.circleci/config.yml', 'path/to/custom-config.yml']
+        output: [
+             'module1/.circleci/config.yml',
+             'module2/.circleci/config.yml',
+             '.circleci/config.yml',
+             'path/to/custom-config.yml',
+         ]
+    :param input_modules: sequence of module names and/or paths to config yaml files
+    :return: a set of paths to config yaml files
     """
     modules = set()
     for module in input_modules:
@@ -24,14 +32,14 @@ def get_modules(input_modules: Sequence[str]) -> Set[str]:
             continue
 
         module = module.strip()
-        if module.endswith("config.yml"):
-            modules.add(f"{module}\n")
+        if module.endswith("config.yml") or module.endswith("config.yaml"):
+            modules.add(f"{module}")
             continue
 
         if module.endswith("/"):
-            module = f"{module}.circleci/config.yml\n"
+            module = f"{module}.circleci/config.yml"
         else:
-            module = f"{module}/.circleci/config.yml\n"
+            module = f"{module}/.circleci/config.yml"
 
         modules.add(module)
 
@@ -56,7 +64,7 @@ def dump_modules(modules: Iterable[str]) -> None:
     :return:
     """
     with open(getenv("MODULES_PATH", DEFAULT_MODULES_PATH), 'w') as fd:
-        fd.writelines(modules)
+        fd.writelines([x if x.endswith("\n") else f"{x}\n" for x in modules])
 
 
 def main() -> None:
@@ -65,7 +73,9 @@ def main() -> None:
     check that all exist and write unique paths into an output file
     :return:
     """
-    modules = get_modules(open(getenv("MODULES_PATH", DEFAULT_MODULES_PATH)).readlines() or [])  # pylint: disable=R1732
+    with open(getenv("MODULES_PATH", DEFAULT_MODULES_PATH)) as fd:
+        modules = get_modules(fd.readlines() or [])  # pylint: disable=R1732
+
     if not modules:
         print("Modules file is empty")
 
