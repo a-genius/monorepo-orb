@@ -5,7 +5,7 @@ import sys
 import re
 from json import loads, dump, dumps
 from os import getenv
-from typing import Any, Sequence, Tuple
+from typing import Any, Sequence, Tuple, Optional
 
 import requests
 
@@ -20,7 +20,7 @@ def run_cmd(cmd: Sequence[str]) -> str:
 
 
 def find_parent_commit(
-    current_branch: str, remote: str, since: int = 1, timeframe: str = "month"
+    current_branch: str, remote: Optional[str], since: int = 1, timeframe: str = "month"
 ) -> str:
     max_age = int(getenv("MAX_AGE", "4"))
     no_pager = "--no-pager"
@@ -55,8 +55,11 @@ def find_parent_commit(
     return find_parent_commit(current_branch, remote, since + 1, timeframe)
 
 
-def find_diff_files(base: str, head: str) -> str:
-    diff_commits = f"{base}..{head}"
+def find_diff_files(base: str, head: str, remote: str = None) -> str:
+    if remote:
+        base = f"{remote}/{base}"  # pragma: no cover  during tests we don't have remote
+
+    diff_commits = f"{base}...{head}"
     print(f"Getting diff: {diff_commits}")
     cmd = ["git", "--no-pager", "diff", "--name-only", diff_commits]
     return run_cmd(cmd)
@@ -138,7 +141,7 @@ def log_block(name: str, data: Any, divider: str = "=", max_symbols: int = 64) -
     print(data, divider * max_symbols, sep="\n")
 
 
-def get_base() -> str:
+def get_base(remote: str = None) -> str:
     base = getenv('BASE_REVISION')
     msg = f"Base revision set to {base}"
     # first try to get base from PR, it requires the least resources
@@ -158,7 +161,6 @@ def get_base() -> str:
 
     if not base:
         current_branch = getenv("CIRCLE_BRANCH", "")
-        remote = run_cmd(["git", "--no-pager", "remote", "show"]).splitlines()[0]
         if not current_branch:
             current_branch = getenv("CIRCLE_TAG", "")
             remote = "tags"
@@ -199,13 +201,17 @@ def main() -> None:
         raise RuntimeError("Running outside of CircleCI environment. Aborting")
 
     mappings = get_mappings(getenv('MAPPINGS', ''))
-    base = get_base()
+    remote = run_cmd(["git", "--no-pager", "remote", "show"]).splitlines()[0]
+    base = get_base(remote)
     head = getenv('CIRCLE_SHA1', 'HEAD')
     subprocess.run(["git", "fetch", "--all"], check=True, stdout=sys.stdout, stderr=sys.stderr)
     try:
-        diff = find_diff_files(base, head)
+        diff = find_diff_files(base, head, remote)
     except subprocess.CalledProcessError as e:
-        log_block("Failed to get diff", str(e))
+        err = str(e)
+        if hasattr(e, 'stderr'):  # pragma: no cover
+            err = err + "\n" + str(e.stderr)
+        log_block("Failed to get diff", err)
         print(f"Using fallback base - {DEFAULT_BASE}")
         diff = find_diff_files(DEFAULT_BASE, head)
 
