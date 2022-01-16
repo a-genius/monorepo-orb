@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2022-01-016
+### Changed
+- specify remote when getting the diff. Now remote is assigned to a variable in main and passed to both get_base and
+  find_diff_files
+- improves error message in the catch block when getting the diff
+
 ## [0.1.4] - 2022-01-016
 ### Added
 - message that is printed out when the pattern matches in the commit subject.
@@ -40,6 +46,7 @@ A minor release to indicate the fast pace of changes
 - Initial release of CircleCI orb.
 
 [Unreleased]: https://github.com/a-genius/monorepo-orb/compare/v0.1.4...main
+[0.1.5]: https://github.com/a-genius/monorepo-orb/compare/v0.1.5
 [0.1.4]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.4
 [0.1.3]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.3
 [0.1.2]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.2
