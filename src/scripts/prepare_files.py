@@ -9,6 +9,8 @@ from typing import Any, Sequence, Tuple
 
 import requests
 
+DEFAULT_BASE = "HEAD~1"
+
 
 def run_cmd(cmd: Sequence[str]) -> str:
     if sys.version_info < (3, 7):
@@ -164,7 +166,7 @@ def get_base() -> str:
         msg = f"Got base commit: {base}"
 
     if not base:
-        base = "HEAD~1"
+        base = DEFAULT_BASE
         msg = f"No base found! Will use {base} as base."
 
     log_block("base_revision", msg)
@@ -200,7 +202,13 @@ def main() -> None:
     base = get_base()
     head = getenv('CIRCLE_SHA1', 'HEAD')
     subprocess.run(["git", "fetch", "--all"], check=True, stdout=sys.stdout, stderr=sys.stderr)
-    diff = find_diff_files(base, head)
+    try:
+        diff = find_diff_files(base, head)
+    except subprocess.CalledProcessError as e:
+        log_block("Failed to get diff", str(e))
+        print(f"Using fallback base - {DEFAULT_BASE}")
+        diff = find_diff_files(DEFAULT_BASE, head)
+
     log_block("files changed", diff)
     set_params_and_modules(diff, mappings)
 

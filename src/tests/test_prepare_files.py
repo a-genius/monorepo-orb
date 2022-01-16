@@ -1,3 +1,5 @@
+from subprocess import CalledProcessError
+
 import re
 
 from json import load, dumps
@@ -307,6 +309,28 @@ def test_main(monkeypatch, tmpdir, test_git_repo):
 def test_main_outside_ci(monkeypatch):
     monkeypatch.setenv("CIRCLECI", "")
     with pytest.raises(RuntimeError):
+        main()
+
+
+def test_main_diff_fails(monkeypatch, tmpdir, test_git_repo):
+    def _raise():
+        raise CalledProcessError(128, "git")
+    git_repo, _ = test_git_repo
+    monkeypatch.setenv("CIRCLECI", "true")
+    monkeypatch.setenv("MAPPINGS", 'path:changed_file; .; {"param": "val"}')
+    monkeypatch.setenv("CIRCLE_BRANCH", "main")
+    monkeypatch.setenv("CIRCLE_SHA1", "HEAD")
+    out_path = tmpdir / "pipeline-parameters.json"
+    monkeypatch.setenv("PARAMS_PATH", str(out_path))
+    monkeypatch.setattr(
+        "src.scripts.prepare_files.find_parent_commit", lambda x, y, z=1: find_parent_commit(x, None, z)
+    )
+    monkeypatch.setattr(
+        "src.scripts.prepare_files.find_diff_files", lambda x, y, z=1: _raise()
+    )
+    monkeypatch.chdir(git_repo.workspace)
+
+    with pytest.raises(CalledProcessError):
         main()
 
 
