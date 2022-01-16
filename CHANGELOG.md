@@ -5,11 +5,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.1.4] - 2022-01-016
 ### Added
 - message that is printed out when the pattern matches in the commit subject.
+- exception handling in the case when getting the diff fails. This happens in cases when polyrepo is merged together
+  to create a monorepo.
 
 ### Changed
 - `mappings` doc updated with the explanation that `re.search` is used when looking at last commit subject
+
 
 ## [0.1.3] - 2022-01-07
 ### Changed
@@ -34,6 +39,9 @@ A minor release to indicate the fast pace of changes
 ### Added
 - Initial release of CircleCI orb.
 
-[Unreleased]: https://github.com/a-genius/monorepo-orb/compare/v0.1.0...main
+[Unreleased]: https://github.com/a-genius/monorepo-orb/compare/v0.1.4...main
+[0.1.4]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.4
+[0.1.3]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.3
+[0.1.2]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.2
 [0.1.1]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.1
 [0.1.0]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.0
