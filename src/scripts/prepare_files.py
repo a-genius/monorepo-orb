@@ -206,14 +206,22 @@ def main() -> None:
     head = getenv('CIRCLE_SHA1', 'HEAD')
     subprocess.run(["git", "fetch", "--all"], check=True, stdout=sys.stdout, stderr=sys.stderr)
     try:
-        diff = find_diff_files(base, head, remote)
+        diff = find_diff_files(base, head)
     except subprocess.CalledProcessError as e:
         err = str(e)
         if hasattr(e, 'stderr'):  # pragma: no cover
             err = err + "\n" + str(e.stderr)
         log_block("Failed to get diff", err)
-        print(f"Using fallback base - {DEFAULT_BASE}")
-        diff = find_diff_files(DEFAULT_BASE, head)
+
+        try:
+            diff = find_diff_files(base, head, remote)
+        except subprocess.CalledProcessError as e:
+            err = str(e)
+            if hasattr(e, 'stderr'):  # pragma: no cover
+                err = err + "\n" + str(e.stderr)
+            log_block("Failed to get diff", err)
+            print(f"Using fallback base - {DEFAULT_BASE}")
+            diff = find_diff_files(DEFAULT_BASE, head)
 
     log_block("files changed", diff)
     set_params_and_modules(diff, mappings)
