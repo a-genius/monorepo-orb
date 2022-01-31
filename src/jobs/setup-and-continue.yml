@@ -46,6 +46,10 @@ parameters:
     description: ""
     type: executor
     default: python
+  pre-continue:
+    description: "Steps to run before triggering the continuation workflow"
+    type: steps
+    default: []
 
 
 executor: << parameters.executor >>
@@ -71,6 +75,7 @@ steps:
   - run:
       name: Validate continuation config
       command: circleci --skip-update-check config validate << parameters.continue-config >>
+  - steps: << parameters.pre-continue >>
   - continuation/continue:
       configuration_path: << parameters.continue-config >>
       parameters: << parameters.params-path >>
