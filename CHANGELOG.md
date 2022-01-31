@@ -6,13 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.5] - 2022-01-016
+## [0.2.0] - 2022-01-016
+### Added
+- new `pre-continue` parameter in `setup-and-continue` job that allows to specify an array of steps to run
+  before continuation is triggered
+
+### Changed
+- in main, when trying to get the diff block, first try to run `find_diff_files` without specifying remote.
+  Specify remote only if it fails. I've found out that this approach reduces the number of git errors.
+
+## [0.1.5] - 2022-01-16
 ### Changed
 - specify remote when getting the diff. Now remote is assigned to a variable in main and passed to both get_base and
   find_diff_files
 - improves error message in the catch block when getting the diff
 
-## [0.1.4] - 2022-01-016
+## [0.1.4] - 2022-01-16
 ### Added
 - message that is printed out when the pattern matches in the commit subject.
 - exception handling in the case when getting the diff fails. This happens in cases when polyrepo is merged together
@@ -45,8 +54,9 @@ A minor release to indicate the fast pace of changes
 ### Added
 - Initial release of CircleCI orb.
 
-[Unreleased]: https://github.com/a-genius/monorepo-orb/compare/v0.1.4...main
-[0.1.5]: https://github.com/a-genius/monorepo-orb/compare/v0.1.5
+[Unreleased]: https://github.com/a-genius/monorepo-orb/compare/v0.2.0...main
+[0.2.0]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.2.0
+[0.1.5]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.5
 [0.1.4]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.4
 [0.1.3]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.3
 [0.1.2]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.2
