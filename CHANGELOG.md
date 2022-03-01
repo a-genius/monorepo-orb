@@ -6,7 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.2.0] - 2022-01-016
+## [0.2.1] - 2022-01-16
+### Changed
+- fixed an issue where `setup-and-continue` and `setup-without continue` jobs were not passing `get-base-from-github`
+parameter to the `prepare-pipeline-files` command
+
+## [0.2.0] - 2022-01-16
 ### Added
 - new `pre-continue` parameter in `setup-and-continue` job that allows to specify an array of steps to run
   before continuation is triggered
@@ -54,7 +59,8 @@ A minor release to indicate the fast pace of changes
 ### Added
 - Initial release of CircleCI orb.
 
-[Unreleased]: https://github.com/a-genius/monorepo-orb/compare/v0.2.0...main
+[Unreleased]: https://github.com/a-genius/monorepo-orb/compare/v0.2.1...main
+[0.2.1]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.2.1
 [0.2.0]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.2.0
 [0.1.5]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.5
 [0.1.4]: https://github.com/a-genius/monorepo-orb/releases/tag/v0.1.4
