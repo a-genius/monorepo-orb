@@ -59,6 +59,7 @@ steps:
   - checkout
   - prepare-pipeline-files:
       base-revision: << parameters.base-revision >>
+      get-base-from-github: << parameters.get-base-from-github >>
       mappings: << parameters.mappings >>
       max-age: << parameters.max-age >>
       params-path: << parameters.params-path >>
