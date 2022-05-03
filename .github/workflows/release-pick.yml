@@ -1,0 +1,9 @@
+name: Pick commits into a release branch
+on: [pull_request]
+jobs:
+  pick-to-release-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "a"
+#      - name: Check out repository code
+#        uses: actions/checkout@v3
